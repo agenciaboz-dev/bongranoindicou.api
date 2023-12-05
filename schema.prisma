@@ -1,0 +1,163 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model Admin {
+    id                  Int                 @id @default(autoincrement())
+    name                String
+    email               String              @unique
+    password            String
+}
+
+model Customer {
+    id                  Int                 @id @default(autoincrement())
+    name                String
+    email               String              @unique
+    password            String
+    register_date       String
+    phone               String
+    document            String              @unique
+    city                String
+    state               String
+    
+
+    certificateId       Int                 @unique
+    certificate         DigitalCertificate  @relation(fields: [certificateId], references: [id])
+    companies           Company[]
+}
+
+model DigitalCertificate {
+    id                  Int                 @id @default(autoincrement())
+    expiry              String
+    certificate         String              @db.Text
+    
+    customer            Customer?
+}
+
+model Product {
+    id                  Int                    @id @default(autoincrement())
+    name                String              
+    ncm                 String       
+    rules               regraTributacao[]
+
+    notas               notaFiscal[]
+}
+
+model Company {
+    id                  Int                 @id @default(autoincrement())
+    type                String
+    name                String
+    document            String              @unique
+    iine                String
+    city                String
+    state               String
+    district            String
+    street              String
+    adjunct             String
+    number              String
+    cep                 String
+    email               String?
+    phone               String?
+    customerId          Int
+    customer            Customer            @relation(fields: [customerId], references: [id])
+
+    notas               notaFiscal[]
+}
+
+model Natureza {
+
+    id                  Int                 @id @default(autoincrement())
+    operation           String
+    type                String
+    finality            String
+    motive              String
+    rules               regraTributacao[]
+    notas               notaFiscal[]
+
+
+}
+
+model regraTributacao {
+    id                  Int                     @id @default(autoincrement())
+    uf                  String
+    icms                String
+    cfop                String
+    percentage          String
+    motive              String
+    rate                String
+    deferral            String
+    cst                 String
+    cofins              String
+    natures             Natureza[]
+    products            Product[]
+}
+
+model Property {
+
+    id                  Int                     @id @default(autoincrement())
+    ie                  String
+    nifr                String
+    cep                 String
+    city                String
+    state               String
+    street              String
+    number              String
+    adjunct             String
+    district            String
+    exploration         String
+    declarant           String
+    notas               notaFiscal[]
+}
+
+
+
+model notaFiscal {
+    id                  Int                     @id @default(autoincrement())
+    emission            String                  @db.Text
+    series              String
+    nfe                 String
+    clientSupplier      String
+    issuer              String
+    value               String
+    situation           String
+    dateTime            String?                 @db.Text
+    paymentCondition    String
+    paymentType         String
+    freteType           String
+    vehiclePlates       String
+    vehicleUf           String
+    shippingCompany     String
+    productQnty         String
+    productType         String
+    bruteWeightKg       String
+    liquidWeightKg      String
+
+
+
+    products            Product[]
+    
+    companyId           Int
+    company             Company             @relation(fields: [companyId], references: [id])
+
+    propertyId          Int
+    property            Property             @relation(fields: [propertyId], references: [id])
+
+    natureId            Int
+    nature              Natureza             @relation(fields: [natureId], references: [id])
+    
+}
+
+model Accounts {
+    id                  Int                     @id @default (autoincrement())
+    internal            Boolean                 @default(false)
+    name                String
+    agency              String
+    accNumber           String
+    bankName            String
+}
