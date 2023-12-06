@@ -23,3 +23,12 @@ declare interface VerifyForm {
     id: number
     code: string
 }
+
+declare interface ChooseDateForm {
+    timestamps: {
+        start: string
+        end: string
+    }
+
+    user_id: number
+}

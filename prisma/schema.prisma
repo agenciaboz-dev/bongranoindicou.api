@@ -19,7 +19,8 @@ model User {
   number            String?
   cep               String?
   adjunct           String?
-  date              String?
+  date_start        String?     
+  date_end          String?     
 
   referredBy        User?       @relation("ReferredBy", fields: [referredById], references: [id])
   referredById      Int?

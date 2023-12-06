@@ -124,4 +124,24 @@ const createReferral = async (socket: Socket, data: Referral[], referree_id: num
     }
 }
 
-export default { list, create, createReferral, verify };
+const chooseDate = async (socket: Socket, timestamps: { start: string; end: string }, user_id: number) => {
+    const start_date = new Date(Number(timestamps.start)).toLocaleDateString("pt-br")
+    const end_date = new Date(Number(timestamps.end)).toLocaleDateString("pt-br")
+
+    if (start_date < end_date) {
+        console.log("não tem como o fim da data vir antes do começo, ne porra")
+        socket.emit("user:date:error", { error: "invalid dates" })
+        return
+    }
+
+    const user = await databaseHandler.user.updateDates(timestamps.start, timestamps.end, user_id)
+
+    if (!user) {
+        socket.emit("user:date:error", { error: "user not found" })
+        return
+    }
+
+    socket.emit("user:date:success", user)
+}
+
+export default { list, create, createReferral, verify, chooseDate }
