@@ -8,20 +8,20 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 model User {
-  id                Int      @id @default(autoincrement())
+  id                Int         @id @default(autoincrement())
   name              String
+  email             String      @unique
+  whatsapp          String      @unique
   address           String?
   number            String?
   cep               String?
   adjunct           String?
-  email             String?   @unique
-  whatsapp          String
   verificationCode  String?
-  verified          Boolean?  @default(false)
+  verified          Boolean?    @default(false)
   date              String?
-  booked            Boolean?  @default(false)
+  booked            Boolean?    @default(false)
 
-  referredBy        User?    @relation("ReferredBy", fields: [referredById], references: [id])
+  referredBy        User?       @relation("ReferredBy", fields: [referredById], references: [id])
   referredById      Int?
-  referredFriends   User[]   @relation("ReferredBy")
+  referredFriends   User[]      @relation("ReferredBy")
 }
