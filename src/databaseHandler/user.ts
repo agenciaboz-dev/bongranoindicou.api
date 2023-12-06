@@ -19,20 +19,16 @@ const create = async (data: NewUser) => {
   console.log("Iniciando a criação do usuário...");
 
   return await prisma.user.create({
-    data: {
-      name: data.name,
-      address: data.address,
-      number: data.number,
-      cep: data.cep,
-      adjunct: data.adjunct,
-      email: data.email,
-      whatsapp: data.whatsapp,
-      verified: data.verified,
-      date: data.date,
-      verificationCode: data.verificationCode,
-      booked: data.booked,
-    },
-  });
+      data: {
+          name: data.name,
+          address: data.address,
+          number: data.number,
+          cep: data.cep,
+          adjunct: data.adjunct,
+          email: data.email,
+          whatsapp: data.whatsapp
+      }
+  })
 };
 
 const verify = async (id: number) => {

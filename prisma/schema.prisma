@@ -12,14 +12,14 @@ model User {
   name              String
   email             String      @unique
   whatsapp          String      @unique
+  verified          Boolean     @default(false)
+  booked            Boolean     @default(false)
+
   address           String?
   number            String?
   cep               String?
   adjunct           String?
-  verificationCode  String?
-  verified          Boolean?    @default(false)
   date              String?
-  booked            Boolean?    @default(false)
 
   referredBy        User?       @relation("ReferredBy", fields: [referredById], references: [id])
   referredById      Int?
