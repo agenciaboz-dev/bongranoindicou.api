@@ -1,35 +1,34 @@
-import { User, PrismaClient } from "@prisma/client";
-import { NewUser, Referral } from "../definitions/userOperations";
+import { User, PrismaClient } from "@prisma/client"
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 // Função para listar todos os CLIENTES, omitindo informações sensíveis.
 const list = async () => {
-  const users = await prisma.user.findMany({
-    include: {
-      referredFriends: true,
-    },
-  });
+    const users = await prisma.user.findMany({
+        include: {
+            referredFriends: true
+        }
+    })
 
-  return users;
-};
+    return users
+}
 
 // Função de criação de novos CLIENTES.
 const create = async (data: NewUser) => {
-  console.log("Iniciando a criação do usuário...");
+    console.log("Iniciando a criação do usuário...")
 
-  return await prisma.user.create({
-      data: {
-          name: data.name,
-          address: data.address,
-          number: data.number,
-          cep: data.cep,
-          adjunct: data.adjunct,
-          email: data.email,
-          whatsapp: data.whatsapp
-      }
-  })
-};
+    return await prisma.user.create({
+        data: {
+            name: data.name,
+            address: data.address,
+            number: data.number,
+            cep: data.cep,
+            adjunct: data.adjunct,
+            email: data.email,
+            whatsapp: data.whatsapp
+        }
+    })
+}
 
 const verify = async (id: number) =>
     await prisma.user.update({
@@ -40,10 +39,10 @@ const verify = async (id: number) =>
     })
 
 const exists = async (id: number) => {
-  return await prisma.user.findUnique({
-    where: { id },
-  });
-};
+    return await prisma.user.findUnique({
+        where: { id }
+    })
+}
 
 const referral = async (data: Referral, referree_id: number) => {
     console.log("Iniciando a criação do usuário referal...")
@@ -57,5 +56,5 @@ const referral = async (data: Referral, referree_id: number) => {
     })
 }
 
-export default { list, create, verify, exists, referral };
+export default { list, create, verify, exists, referral }
 // export default { selections, list, create, exists };

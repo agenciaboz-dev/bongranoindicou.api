@@ -1,23 +1,25 @@
-import { User } from "@prisma/client";
-import { type } from "os";
-
-export declare interface NewUser {
-  name: string;
-  address: string;
-  number: string;
-  cep: string;
-  adjunct: string;
-  email: string;
-  whatsapp: string;
-  verified: boolean;
-  verificationCode: string;
-  date: string;
-  booked: boolean;
+declare interface NewUser {
+    name: string
+    address: string
+    number: string
+    cep: string
+    adjunct: string
+    email: string
+    whatsapp: string
 }
 
-export declare interface Referral {
-  name: string;
-  email: string;
-  whatsapp: string;
-  referredById: number;
+declare interface Referral {
+    name: string
+    email: string
+    whatsapp: string
+}
+
+declare interface ReferralForm {
+    referrals: Referral[]
+    referree_id: number
+}
+
+declare interface VerifyForm {
+    id: number
+    code: string
 }

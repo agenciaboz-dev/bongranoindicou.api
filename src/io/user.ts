@@ -1,6 +1,5 @@
 import { Socket } from "socket.io";
-import databaseHandler from "../databaseHandler";
-import { NewUser, Referral } from "../definitions/userOperations";
+import databaseHandler from "../databaseHandler"
 import Hashids from "hashids";
 import { sendMail } from "../scripts/mail"
 import { verification_email } from "../templates/email/verification"
