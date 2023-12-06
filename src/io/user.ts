@@ -1,45 +1,116 @@
-// import { Socket } from "socket.io";
-// import databaseHandler from "../databaseHandler";
-// import { NewUser } from "../definitions/userOperations";
+import { Socket } from "socket.io";
+import databaseHandler from "../databaseHandler";
+import { NewUser, Referral } from "../definitions/userOperations";
+import Hashids from "hashids";
 
-// const list = async (socket: Socket) => {
-//   try {
-//     const customer = await databaseHandler.customer.customerList();
-//     socket.emit("customer:list", customer);
-//   } catch (error) {
-//     console.error(`Error fetching customer list`);
-//     socket.emit("customer:list:error", { error });
-//   }
-// };
+const hashid = new Hashids("bunda", 5);
 
-// const handleSignup = async (
-//   socket: Socket,
-//   data: NewUser // Change 'any' to 'NewUser' to ensure type safety
-// ) => {
-//   try {
-//     const customer = await databaseHandler.customer.create(data);
-//     // Emit success event
-//     socket.emit("user:signup:success", customer);
-//   } catch (error: any) {
-//     console.log(error);
-//     if (error.code === "P2002" && error.meta) {
-//       // Mapping field errors to error messages
-//       const fieldErrorMap: any = {
-//         username: "Username already exists.",
-//         email: "Email already exists.",
-//         document: "document already registered.",
-//       };
-//       // Check which field caused the error
-//       for (const field in fieldErrorMap) {
-//         if (error.meta.target.includes(field)) {
-//           socket.emit("user:signup:failed", {
-//             error: fieldErrorMap[field],
-//           });
-//           break;
-//         }
-//       }
-//     }
-//   }
-// };
+const list = async (socket: Socket) => {
+  try {
+    const customer = await databaseHandler.user.list();
+    socket.emit("customer:list", customer);
+  } catch (error) {
+    console.error(`Error fetching customer list`);
+    socket.emit("customer:list:error", { error });
+  }
+};
 
-// export default { list, handleSignup };
+const create = async (socket: Socket, data: NewUser) => {
+  try {
+    const user = await databaseHandler.user.create(data);
+
+    // Encode the user's ID
+    const encodedId = hashid.encode(user.id);
+
+    // Create the URL for the user's verification page
+    const url = `https://example.com/user/${encodedId}`;
+
+    // Emit success event with the url and encodedId
+    socket.emit("user:registration:success", { user, url, encodedId });
+  } catch (error: any) {
+    console.log(error);
+    if (error.code === "P2002" && error.meta) {
+      // Mapping field errors to error messages
+      const fieldErrorMap: any = {
+        email: "Email already exists.",
+      };
+      // Check which field caused the error
+      for (const field in fieldErrorMap) {
+        if (error.meta.target.includes(field)) {
+          socket.emit("user:registration:failed", {
+            error: fieldErrorMap[field],
+          });
+          break;
+        }
+      }
+    }
+  }
+};
+
+const verify = async (socket: Socket, id: number) => {
+  try {
+    // Check if the user exists
+    const user = await databaseHandler.user.exists(id);
+
+    if (!user) {
+      // If the user doesn't exist, emit an error event
+      socket.emit("application:aproval:error", {
+        error: "User not found",
+      });
+      return;
+    }
+
+    // Check if the user is already verified
+    if (user.verified) {
+      // If the user is already verified, emit an error event
+      socket.emit("application:aproval:error", {
+        error: "User is already verified",
+      });
+      return;
+    }
+
+    // FALTANDO LÓGICA DE VERIFICAÇÃO DO CODIGO DE VERIFICAÇÃO ENVIADO NO EMAIL
+
+    // Update the user's verification status to true
+    await databaseHandler.user.verify(id);
+    // Emit a successful verification event
+    socket.emit("application:status:approved", {
+      message: "Your account has been verified.",
+    });
+  } catch (error: any) {
+    console.log(error);
+
+    // Emit a generic error event if there's an issue with verification
+    socket.emit("application:aproval:error", {
+      error: "Verification Error",
+    });
+  }
+};
+
+const createReferral = async (socket: Socket, data: Referral) => {
+  try {
+    console.log(data);
+    const user = await databaseHandler.user.referral(data);
+    // Emit success event
+    socket.emit("referral:registration:success", user);
+  } catch (error: any) {
+    console.log(error);
+    if (error.code === "P2002" && error.meta) {
+      // Mapping field errors to error messages
+      const fieldErrorMap: any = {
+        email: "Email already exists.",
+      };
+      // Check which field caused the error
+      for (const field in fieldErrorMap) {
+        if (error.meta.target.includes(field)) {
+          socket.emit("user:registration:failed", {
+            error: fieldErrorMap[field],
+          });
+          break;
+        }
+      }
+    }
+  }
+};
+
+export default { list, create, createReferral, verify };

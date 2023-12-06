@@ -10,18 +10,18 @@ datasource db {
 model User {
   id                Int      @id @default(autoincrement())
   name              String
-  address           String
-  number            String
-  cep               String
-  adjunct           String
-  email             String   @unique
+  address           String?
+  number            String?
+  cep               String?
+  adjunct           String?
+  email             String?   @unique
   whatsapp          String
-  verified          Boolean  @default(false)
-  friend1           Int?
-  friend2           String
-  friend3           String
-  date              String
-  verificationCode  String
-  verificationSentAt DateTime?   // Add a timestamp for when the verification code was sent
-  booked            Boolean  @default(false)
+  verificationCode  String?
+  verified          Boolean?  @default(false)
+  date              String?
+  booked            Boolean?  @default(false)
+
+  referredBy        User?    @relation("ReferredBy", fields: [referredById], references: [id])
+  referredById      Int?
+  referredFriends   User[]   @relation("ReferredBy")
 }

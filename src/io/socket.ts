@@ -2,6 +2,7 @@ import { Socket } from "socket.io";
 import { Server as SocketIoServer } from "socket.io";
 import { Server as HttpServer } from "http";
 import { Server as HttpsServer } from "https";
+import user from "./user";
 
 let io: SocketIoServer | null = null;
 
@@ -33,6 +34,8 @@ export const handleSocket = (socket: Socket) => {
     console.log(data);
   });
 
-
+  socket.on("user:list", () => user.list(socket));
+  socket.on("user:create", (data) => user.create(socket, data));
+  socket.on("user:verify", (id) => user.verify(socket, id));
+  socket.on("user:referral", (data) => user.createReferral(socket, data));
 };
-

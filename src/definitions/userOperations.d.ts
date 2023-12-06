@@ -10,9 +10,14 @@ export declare interface NewUser {
   email: string;
   whatsapp: string;
   verified: boolean;
-  friend1: string;
-  friend2: string;
-  friend3: string;
+  verificationCode: string;
   date: string;
   booked: boolean;
+}
+
+export declare interface Referral {
+  name: string;
+  email: string;
+  whatsapp: string;
+  referredById: number;
 }
