@@ -86,30 +86,43 @@ const verify = async (socket: Socket, id: number, code: string) => {
     }
 }
 
-const createReferral = async (socket: Socket, data: Referral) => {
-  try {
-    console.log(data);
-    const user = await databaseHandler.user.referral(data);
-    // Emit success event
-    socket.emit("referral:registration:success", user);
-  } catch (error: any) {
-    console.log(error);
-    if (error.code === "P2002" && error.meta) {
-      // Mapping field errors to error messages
-      const fieldErrorMap: any = {
-        email: "Email already exists.",
-      };
-      // Check which field caused the error
-      for (const field in fieldErrorMap) {
-        if (error.meta.target.includes(field)) {
-          socket.emit("user:registration:failed", {
-            error: fieldErrorMap[field],
-          });
-          break;
+const createReferral = async (socket: Socket, data: Referral[], referree_id: number) => {
+    try {
+        console.log(data)
+
+        if (data.length < 3) {
+            console.log("vc não tem amigos suficientes, trouxa")
+            socket.emit("referral:registration:failed", { error: "there aren't 3 refferrals" })
+            return
         }
-      }
+
+        const referrals = await Promise.all(
+            data.map(async (referral) => {
+                const user = await databaseHandler.user.referral(referral, referree_id)
+                return user
+            })
+        )
+
+        socket.emit("referral:registration:success", referrals)
+        //
+    } catch (error: any) {
+        console.log(error)
+        if (error.code === "P2002" && error.meta) {
+            // Mapping field errors to error messages
+            const fieldErrorMap: any = {
+                email: "Email already exists."
+            }
+            // Check which field caused the error
+            for (const field in fieldErrorMap) {
+                if (error.meta.target.includes(field)) {
+                    socket.emit("referral:registration:failed", {
+                        error: fieldErrorMap[field]
+                    })
+                    break
+                }
+            }
+        }
     }
-  }
-};
+}
 
 export default { list, create, createReferral, verify };

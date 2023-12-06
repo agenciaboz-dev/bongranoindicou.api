@@ -45,19 +45,17 @@ const exists = async (id: number) => {
   });
 };
 
-const referral = async (data: Referral) => {
-  console.log("Iniciando a criação do usuário referal...");
-  return await prisma.user.create({
-    data: {
-      name: data.name,
-      email: data.email,
-      whatsapp: data.whatsapp,
-      referredBy: {
-        connect: { id: data.referredById },
-      },
-    },
-  });
-};
+const referral = async (data: Referral, referree_id: number) => {
+    console.log("Iniciando a criação do usuário referal...")
+    return await prisma.user.create({
+        data: {
+            name: data.name,
+            email: data.email,
+            whatsapp: data.whatsapp,
+            referredById: referree_id
+        }
+    })
+}
 
 export default { list, create, verify, exists, referral };
 // export default { selections, list, create, exists };

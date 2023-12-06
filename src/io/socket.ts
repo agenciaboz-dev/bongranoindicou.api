@@ -35,5 +35,5 @@ export const handleSocket = (socket: Socket) => {
     socket.on("user:list", () => user.list(socket))
     socket.on("user:create", (data) => user.create(socket, data))
     socket.on("user:verify", (data) => user.verify(socket, data.id, data.code))
-    socket.on("user:referral", (data) => user.createReferral(socket, data))
+    socket.on("user:referral", (data) => user.createReferral(socket, data.referrals, data.referree_id))
 }
