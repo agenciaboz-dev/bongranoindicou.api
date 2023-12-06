@@ -6,7 +6,7 @@ import { sendMail } from "../scripts/mail"
 import { verification_email } from "../templates/email/verification"
 
 const hashid = {
-    verification: new Hashids("bunda", 5),
+    verification: new Hashids("bunda", 5, "QWERTYUIOPASDFGHJKLZXCVBNM"),
     referral: new Hashids("bunda", 20)
 }
 
@@ -51,45 +51,40 @@ const create = async (socket: Socket, data: NewUser) => {
     }
 }
 
-const verify = async (socket: Socket, id: number) => {
-  try {
-    // Check if the user exists
-    const user = await databaseHandler.user.exists(id);
+const verify = async (socket: Socket, id: number, code: string) => {
+    try {
+        // Check if the user exists
+        const user = await databaseHandler.user.exists(id)
 
-    if (!user) {
-      // If the user doesn't exist, emit an error event
-      socket.emit("application:aproval:error", {
-        error: "User not found",
-      });
-      return;
+        if (!user) {
+            // If the user doesn't exist, emit an error event
+            socket.emit("application:aproval:error", {
+                error: "User not found"
+            })
+            return
+        }
+
+        // FALTANDO LÓGICA DE VERIFICAÇÃO DO CODIGO DE VERIFICAÇÃO ENVIADO NO EMAIL
+        const decoded = hashid.verification.decode(code)
+        if (Number(decoded) != user.id) {
+            socket.emit("application:aproval:error", { error: "código inválido" })
+            return
+        }
+
+        await databaseHandler.user.verify(user.id)
+
+        socket.emit("application:status:approved", {
+            message: "Your account has been verified."
+        })
+    } catch (error: any) {
+        console.log(error)
+
+        // Emit a generic error event if there's an issue with verification
+        socket.emit("application:aproval:error", {
+            error: "Verification Error"
+        })
     }
-
-    // Check if the user is already verified
-    if (user.verified) {
-      // If the user is already verified, emit an error event
-      socket.emit("application:aproval:error", {
-        error: "User is already verified",
-      });
-      return;
-    }
-
-    // FALTANDO LÓGICA DE VERIFICAÇÃO DO CODIGO DE VERIFICAÇÃO ENVIADO NO EMAIL
-
-    // Update the user's verification status to true
-    await databaseHandler.user.verify(id);
-    // Emit a successful verification event
-    socket.emit("application:status:approved", {
-      message: "Your account has been verified.",
-    });
-  } catch (error: any) {
-    console.log(error);
-
-    // Emit a generic error event if there's an issue with verification
-    socket.emit("application:aproval:error", {
-      error: "Verification Error",
-    });
-  }
-};
+}
 
 const createReferral = async (socket: Socket, data: Referral) => {
   try {

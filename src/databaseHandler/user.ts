@@ -31,14 +31,13 @@ const create = async (data: NewUser) => {
   })
 };
 
-const verify = async (id: number) => {
-  return await prisma.user.update({
-    where: { id },
-    data: {
-      verified: true,
-    },
-  });
-};
+const verify = async (id: number) =>
+    await prisma.user.update({
+        where: { id },
+        data: {
+            verified: true
+        }
+    })
 
 const exists = async (id: number) => {
   return await prisma.user.findUnique({
