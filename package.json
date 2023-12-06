@@ -1,7 +1,7 @@
 {
   "name": "bongranoindicou.api",
   "version": "1.0.0",
-  "description": "Campanha de indicações Bongrano",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,19 +9,8 @@
     "start": "node dist/index.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/agenciaboz-dev/sorteiobongrano.api.git"
-  },
-  "keywords": [
-    "sorteio"
-  ],
-  "author": "Agencia BOZ",
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/agenciaboz-dev/sorteiobongrano.api/issues"
-  },
-  "homepage": "https://github.com/agenciaboz-dev/sorteiobongrano.api#readme",
   "dependencies": {
     "@prisma/client": "^5.6.0",
     "axios": "^1.6.2",
@@ -33,7 +22,6 @@
     "https": "^1.0.0",
     "socket.io": "^4.7.2"
   },
-  
   "devDependencies": {
     "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.17",
