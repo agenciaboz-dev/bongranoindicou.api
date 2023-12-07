@@ -159,7 +159,7 @@ const chooseDate = async (socket: Socket, timestamps: { start: string; end: stri
     const start_date = new Date(Number(timestamps.start)).toLocaleDateString("pt-br")
     const end_date = new Date(Number(timestamps.end)).toLocaleDateString("pt-br")
 
-    if (start_date < end_date) {
+    if (start_date > end_date) {
         console.log("não tem como o fim da data vir antes do começo, ne porra")
         socket.emit("user:date:error", { error: "invalid dates" })
         return
