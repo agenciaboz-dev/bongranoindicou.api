@@ -3,6 +3,7 @@ import databaseHandler from "../databaseHandler"
 import Hashids from "hashids";
 import { sendMail } from "../scripts/mail"
 import { verification_email } from "../templates/email/verification"
+import { referral_email } from "../templates/email/referral"
 
 const hashid = {
     verification: new Hashids("bunda", 5, "QWERTYUIOPASDFGHJKLZXCVBNM"),
@@ -59,7 +60,7 @@ const verify = async (socket: Socket, id: number, code: string) => {
         if (!user) {
             // If the user doesn't exist, emit an error event
             socket.emit("application:aproval:error", {
-                error: "User not found"
+                error: "usuário não encontrado"
             })
             return
         }
@@ -109,23 +110,25 @@ const createReferral = async (socket: Socket, data: Referral[], referree_id: num
         const exist_any = await Promise.all(
             data.map(async (referral) => {
                 const user = await databaseHandler.user.exists({ email: referral.email, whatsapp: referral.whatsapp })
-                return user
-            })
-        )
-        if (
-            exist_any.every((user) => {
-                if (!!user) {
-                    socket.emit("referral:registration:failed", { error: `${user.name} já cadastrado` })
+                if (user) {
+                    const error = `${user.name} já cadastrado`
+                    socket.emit("referral:registration:failed", { error })
+                    console.log(error)
                     return true
                 }
             })
-        ) {
+        )
+
+        if (exist_any.includes(true)) {
             return
         }
 
         const referrals = await Promise.all(
             data.map(async (referral) => {
                 const user = await databaseHandler.user.referral(referral, referree.id)
+                const url = `resto_da_url${hashid.referral.encode(user.id)}`
+                const email = await sendMail(user.email, "Indicação", url, referral_email(url))
+                console.log(email)
                 return user
             })
         )
