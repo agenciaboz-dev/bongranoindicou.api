@@ -10,6 +10,17 @@ const hashid = {
     referral: new Hashids("bunda", 20)
 }
 
+const handleHash = async (socket: Socket, hash: string) => {
+    const id = Number(hashid.referral.decode(hash))
+    const user = await databaseHandler.user.find(id)
+
+    if (user) {
+        socket.emit("user:hash", user)
+    } else {
+        socket.emit("user:hash:failed", { error: "usuário não encontrado" })
+    }
+}
+
 const list = async (socket: Socket) => {
     try {
         const customer = await databaseHandler.user.list()
@@ -21,9 +32,9 @@ const list = async (socket: Socket) => {
     }
 }
 
-const create = async (socket: Socket, data: NewUser) => {
+const create = async (socket: Socket, data: NewUser, id?: number) => {
     try {
-        const user = await databaseHandler.user.create(data)
+        const user = id ? await databaseHandler.user.update(data, id) : await databaseHandler.user.create(data)
 
         const encodedId = hashid.verification.encode(user.id)
 
@@ -155,24 +166,20 @@ const createReferral = async (socket: Socket, data: Referral[], referree_id: num
     }
 }
 
-const chooseDate = async (socket: Socket, timestamps: { start: string; end: string }, user_id: number) => {
-    const start_date = new Date(Number(timestamps.start)).toLocaleDateString("pt-br")
-    const end_date = new Date(Number(timestamps.end)).toLocaleDateString("pt-br")
+const chooseDate = async (socket: Socket, date: string, user_id: number) => {
+    try {
+        const user = await databaseHandler.user.updateDates(date, user_id)
 
-    if (start_date > end_date) {
-        console.log("não tem como o fim da data vir antes do começo, ne porra")
-        socket.emit("user:date:error", { error: "invalid dates" })
-        return
+        if (!user) {
+            socket.emit("user:date:error", { error: "user not found" })
+            return
+        }
+
+        socket.emit("user:date:success", user)
+    } catch (error) {
+        console.log(error)
+        socket.emit("user:date:error", { error })
     }
-
-    const user = await databaseHandler.user.updateDates(timestamps.start, timestamps.end, user_id)
-
-    if (!user) {
-        socket.emit("user:date:error", { error: "user not found" })
-        return
-    }
-
-    socket.emit("user:date:success", user)
 }
 
-export default { list, create, createReferral, verify, chooseDate }
+export default { list, create, createReferral, verify, chooseDate, handleHash }

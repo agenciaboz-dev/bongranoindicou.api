@@ -33,8 +33,10 @@ export const handleSocket = (socket: Socket) => {
     })
 
     socket.on("user:list", () => user.list(socket))
-    socket.on("user:create", (data: NewUser) => user.create(socket, data))
+    socket.on("user:create", (data: NewUser & { id?: number }) => user.create(socket, data, data.id))
     socket.on("user:verify", (data: VerifyForm) => user.verify(socket, data.id, data.code))
     socket.on("user:referral", (data: ReferralForm) => user.createReferral(socket, data.referrals, data.referree_id))
-    socket.on("user:date", (data: ChooseDateForm) => user.chooseDate(socket, data.timestamps, data.user_id))
+    socket.on("user:date", (data: ChooseDateForm) => user.chooseDate(socket, data.date, data.user_id))
+    socket.on("user:hash", (data: string) => user.handleHash(socket, data))
+
 }

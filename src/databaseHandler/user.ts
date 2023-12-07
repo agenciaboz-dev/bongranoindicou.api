@@ -67,8 +67,9 @@ const referral = async (data: Referral, referree_id: number) => {
     })
 }
 
-const updateDates = async (start: string, end: string, id: number) =>
-    await prisma.user.update({ where: { id }, data: { date_start: start, date_end: end } })
+const update = async (data: NewUser, id: number) => await prisma.user.update({ where: { id }, data })
 
-export default { include, list, create, verify, find, referral, updateDates, exists }
+const updateDates = async (date: string, id: number) => await prisma.user.update({ where: { id }, data: { delivery_date: date } })
+
+export default { include, list, create, verify, find, referral, updateDates, exists, update }
 // export default { selections, list, create, exists };
