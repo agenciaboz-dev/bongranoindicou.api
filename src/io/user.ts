@@ -30,6 +30,7 @@ const create = async (socket: Socket, data: NewUser) => {
 
         const email_response = await sendMail(user.email, "Código de verificação", encodedId, verification_email(encodedId))
         console.log(email_response)
+        console.log({ code: encodedId })
     } catch (error: any) {
         console.log(error)
         if (error.code === "P2002" && error.meta) {
@@ -53,7 +54,7 @@ const create = async (socket: Socket, data: NewUser) => {
 const verify = async (socket: Socket, id: number, code: string) => {
     try {
         // Check if the user exists
-        const user = await databaseHandler.user.exists(id)
+        const user = await databaseHandler.user.find(id)
 
         if (!user) {
             // If the user doesn't exist, emit an error event
@@ -87,17 +88,44 @@ const verify = async (socket: Socket, id: number, code: string) => {
 
 const createReferral = async (socket: Socket, data: Referral[], referree_id: number) => {
     try {
-        console.log(data)
+        const referree = await databaseHandler.user.find(referree_id)
+
+        if (!referree) {
+            socket.emit("referral:registration:failed", { error: "usuário não encontrado" })
+            return
+        }
+
+        if (!!referree.referredFriends.length) {
+            socket.emit("referral:registration:failed", { error: "usuário já indicou" })
+            return
+        }
 
         if (data.length < 3) {
             console.log("vc não tem amigos suficientes, trouxa")
-            socket.emit("referral:registration:failed", { error: "there aren't 3 refferrals" })
+            socket.emit("referral:registration:failed", { error: "precisa ter 3 indicações" })
+            return
+        }
+
+        const exist_any = await Promise.all(
+            data.map(async (referral) => {
+                const user = await databaseHandler.user.exists({ email: referral.email, whatsapp: referral.whatsapp })
+                return user
+            })
+        )
+        if (
+            exist_any.every((user) => {
+                if (!!user) {
+                    socket.emit("referral:registration:failed", { error: `${user.name} já cadastrado` })
+                    return true
+                }
+            })
+        ) {
             return
         }
 
         const referrals = await Promise.all(
             data.map(async (referral) => {
-                const user = await databaseHandler.user.referral(referral, referree_id)
+                const user = await databaseHandler.user.referral(referral, referree.id)
                 return user
             })
         )

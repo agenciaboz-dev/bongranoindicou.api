@@ -2,6 +2,8 @@ import { User, PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
+const include = { referredFriends: true, referredBy: true }
+
 // Função para listar todos os CLIENTES, omitindo informações sensíveis.
 const list = async () => {
     const users = await prisma.user.findMany({
@@ -38,11 +40,20 @@ const verify = async (id: number) =>
         }
     })
 
-const exists = async (id: number) => {
+const find = async (id: number) => {
     return await prisma.user.findUnique({
-        where: { id }
+        where: { id },
+        include
     })
 }
+
+interface ExistsData {
+    id?: number
+    whatsapp?: string
+    email?: string
+}
+const exists = async ({ id, email, whatsapp }: ExistsData) =>
+    await prisma.user.findFirst({ where: { OR: [{ id }, { email }, { whatsapp }] }, include })
 
 const referral = async (data: Referral, referree_id: number) => {
     console.log("Iniciando a criação do usuário referal...")
@@ -59,5 +70,5 @@ const referral = async (data: Referral, referree_id: number) => {
 const updateDates = async (start: string, end: string, id: number) =>
     await prisma.user.update({ where: { id }, data: { date_start: start, date_end: end } })
 
-export default { list, create, verify, exists, referral, updateDates }
+export default { include, list, create, verify, find, referral, updateDates, exists }
 // export default { selections, list, create, exists };
