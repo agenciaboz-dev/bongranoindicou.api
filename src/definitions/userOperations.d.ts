@@ -25,10 +25,7 @@ declare interface VerifyForm {
 }
 
 declare interface ChooseDateForm {
-    timestamps: {
-        start: string
-        end: string
-    }
+    date: string
 
     user_id: number
 }
