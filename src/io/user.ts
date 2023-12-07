@@ -137,7 +137,7 @@ const createReferral = async (socket: Socket, data: Referral[], referree_id: num
         const referrals = await Promise.all(
             data.map(async (referral) => {
                 const user = await databaseHandler.user.referral(referral, referree.id)
-                const url = `resto_da_url${hashid.referral.encode(user.id)}`
+                const url = `https://bongrano.agenciaboz.com.br/referree/${hashid.referral.encode(user.id)}`
                 const email = await sendMail(user.email, "Indicação", url, referral_email(url))
                 console.log(email)
                 return user
