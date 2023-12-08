@@ -1,28 +1,33 @@
-import * as ClickSendAPI from "clicksend";
+import axios from "axios";
 
 export async function sendSMS(to: string, message: string) {
-  const smsApi = new ClickSendAPI.SMSApi(
-    "lucasboz",
-    "843DD057-2CC7-6DEA-E964-A847CAD0F8B3"
-  );
-
-  const smsMessage = new ClickSendAPI.SmsMessage();
-
-  smsMessage.source = "sdk";
-  smsMessage.to = `+55${to}`;
-  smsMessage.body = message;
-
-  const smsCollection = new ClickSendAPI.SmsMessageCollection();
-
-  smsCollection.messages = [smsMessage];
-
   try {
-    const response = await smsApi.smsSendPost(smsCollection);
-    console.log(response.body);
-  } catch (err) {
-    console.error(err);
+    const smsData = {
+      messages: [
+        {
+          to: to,
+          source: "sdk",
+          body: message,
+        },
+      ],
+    };
+
+    const response = await axios.post(
+      "https://rest.clicksend.com/v3/sms/send",
+      smsData,
+      {
+        auth: {
+          username: "lucasboz",
+          password: "843DD057-2CC7-6DEA-E964-A847CAD0F8B3",
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("SMS sent successfully:", response.data);
+  } catch (error) {
+    console.error("Error sending SMS:", error);
   }
 }
-
-// Example usage
-sendSMS("+0451111111", "test message");
