@@ -308,6 +308,11 @@ chokidar@^3.5.2:
   optionalDependencies:
     fsevents "~2.3.2"
 
+clicksend@^5.0.79:
+  version "5.0.79"
+  resolved "https://registry.npmjs.org/clicksend/-/clicksend-5.0.79.tgz"
+  integrity sha512-g860ungpSzPkAAYkTew+joNnC/20bvz1d9xW0qn8+u9kGD3TsTTeLycIkg4C2OoFWdaMh2UWCIUQZoYRdLroWQ==
+
 cliui@^8.0.1:
   version "8.0.1"
   resolved "https://registry.npmjs.org/cliui/-/cliui-8.0.1.tgz"
