@@ -13,16 +13,14 @@ const verifyServiceSid = "VA1f28bcbc51c26770786687207b2dc1b9";
 // Function to send a verification code via SMS
 export async function sendSMS(recipientPhoneNumber: string, message: string) {
   try {
-    const verification = await client.verify
-      .services(verifyServiceSid)
-      .verifications.create({
-        to: recipientPhoneNumber,
-        channel: "sms",
-        customMessage: message,
-      });
-    console.log("Verification SID:", verification.sid);
+    const sentMessage = await client.messages.create({
+      body: message,
+      from: "your_twilio_phone_number", // Replace with your Twilio phone number
+      to: recipientPhoneNumber,
+    });
+    console.log("Custom SMS SID:", sentMessage.sid);
   } catch (error) {
-    console.error("Error sending verification code:", error);
+    console.error("Error sending custom SMS:", error);
   }
 }
 
