@@ -4,6 +4,4 @@ export const verification_email = (code: string) => `
 <p>${code}</p>
 `;
 
-export const verification_sms = (code: string) => `
-${code}
-`;
+export const verification_sms = (code: string) => `${code}`;
