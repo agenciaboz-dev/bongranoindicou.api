@@ -1,26 +1,30 @@
-import exp from "constants";
-import { send } from "process";
 import twilio from "twilio";
 
-const accountSid = "AC3ae8ebc7d541bf128fc621b8ca78fdde";
-const authToken = "8f3605073dfa69c98ee416d401de3a54";
-const twilioPhoneNumber = "+55041999815114";
+// Replace these values with your Twilio Account SID and Auth Token
+const accountSid = process.env.TWILIO_ACCOUNT_SID || "your_account_sid";
+const authToken = process.env.TWILIO_AUTH_TOKEN || "your_auth_token";
 
+// Create a Twilio client instance
 const client = twilio(accountSid, authToken);
 
-// Function to send an SMS
+// Replace with your Verify service SID
+const verifyServiceSid = "VA1f28bcbc51c26770786687207b2dc1b9";
+
+// Function to send a verification code via SMS
 export async function sendSMS(recipientPhoneNumber: string, message: string) {
   try {
-    await client.messages.create({
-      body: message,
-      from: twilioPhoneNumber,
-      to: recipientPhoneNumber,
-    });
-    console.log("SMS sent successfully");
+    const verification = await client.verify
+      .services(verifyServiceSid)
+      .verifications.create({
+        to: recipientPhoneNumber,
+        channel: "sms",
+        customMessage: message,
+      });
+    console.log("Verification SID:", verification.sid);
   } catch (error) {
-    console.error("Error sending SMS:", error);
+    console.error("Error sending verification code:", error);
   }
 }
 
 // Example usage
-sendSMS("+1234567890", "Your authentication code is: 123456");
+sendSMS("+15017122661", "hello"); // Replace with the recipient's phone number

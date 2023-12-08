@@ -48,7 +48,7 @@ const create = async (socket: Socket, data: NewUser, id?: number) => {
 
     const sms_response = await sendSMS(
       user.whatsapp,
-      `Seu código de verificação é ${verification_sms(encodedId)}`
+      verification_sms(encodedId)
     );
     console.log(sms_response);
     console.log({ code: encodedId });
