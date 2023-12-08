@@ -1,32 +1,33 @@
-import twilio from "twilio";
+import axios from "axios";
 
-// Replace these values with your Twilio Account SID and Auth Token
-const accountSid = process.env.TWILIO_ACCOUNT_SID || "your_account_sid";
-const authToken = process.env.TWILIO_AUTH_TOKEN || "your_auth_token";
-
-// Create a Twilio client instance
-const client = require("twilio")(accountSid, authToken);
-
-// Replace with your Verify service SID
-const verifyServiceSid = "VA1f28bcbc51c26770786687207b2dc1b9";
-
-// Function to send a verification code via SMS
-export async function sendSMS(
-  recipientPhoneNumber: string,
-  customMessage: string
-) {
+export async function sendSMS(to: string, message: string) {
   try {
-    const sentMessage = await client.messages.create({
-      body: customMessage,
-      from: "+12019030981", // Replace with your Twilio phone number
-      to: `+55${recipientPhoneNumber}`,
-    });
+    const smsData = {
+      messages: [
+        {
+          to: `+55${to}`,
+          source: "sdk",
+          body: message,
+        },
+      ],
+    };
 
-    console.log("Custom SMS SID:", sentMessage.sid);
+    const response = await axios.post(
+      "https://rest.clicksend.com/v3/sms/send",
+      smsData,
+      {
+        auth: {
+          username: "lucasboz",
+          password: "843DD057-2CC7-6DEA-E964-A847CAD0F8B3",
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("SMS sent successfully:", response.data);
   } catch (error) {
-    console.error("Error sending custom SMS:", error);
+    console.error("Error sending SMS:", error);
   }
 }
-
-// Example usage
-sendSMS("+15017122661", "hello"); // Replace with the recipient's phone number
