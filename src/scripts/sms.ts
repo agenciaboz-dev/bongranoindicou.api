@@ -9,7 +9,7 @@ export async function sendSMS(to: string, message: string) {
   const smsMessage = new ClickSendAPI.SmsMessage();
 
   smsMessage.source = "sdk";
-  smsMessage.to = to;
+  smsMessage.to = `+55${to}`;
   smsMessage.body = message;
 
   const smsCollection = new ClickSendAPI.SmsMessageCollection();
