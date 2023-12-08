@@ -19,7 +19,7 @@ export async function sendSMS(
     const sentMessage = await client.messages.create({
       body: customMessage,
       from: "+12019030981", // Replace with your Twilio phone number
-      to: recipientPhoneNumber,
+      to: `+55${recipientPhoneNumber}`,
     });
 
     console.log("Custom SMS SID:", sentMessage.sid);
