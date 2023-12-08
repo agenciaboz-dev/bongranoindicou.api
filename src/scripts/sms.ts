@@ -5,7 +5,7 @@ export async function sendSMS(to: string, message: string) {
     const smsData = {
       messages: [
         {
-          to: to,
+          to: `+55${to}`,
           source: "sdk",
           body: message,
         },
